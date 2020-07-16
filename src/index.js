@@ -12,6 +12,7 @@ function CityPicker({
   regionList = [],
   maskCanClose = true,
   isShowPicker = false,
+  placeholder = '请选择城市',
   onFinish,
   onCancel,
 }) {
@@ -20,40 +21,60 @@ function CityPicker({
   let [tempRegionCity, setTempRegionCity] = useState([]); //展示市列表数据
   let [tempRegionDistrict, setTempRegionDistrict] = useState([]); //展示区列表数据
 
-  let [region, setRegion] = useState(data); //选择临时数据
-  let [regionComplete, setRegionComplete] = useState(data); //选择完成数据
+  let [region, setRegion] = useState([]); //选择临时数据
+  let [regionComplete, setRegionComplete] = useState([]); //选择完成数据
   let [selectTab,setSelectTab] = useState(data.length); //选中tab层级
   let [isComplete, setIsComplete] = useState(false); //是否选择完成
 
   let [showListTab,setShowListTab] = useState(data.length||1); //显示省市区其一列表
   
   useEffect(() => {
-    if (regionList.length > 0) {
-      setTempRegionProvince(filterRegion(1));
-      data.length>1&&setTempRegionCity(filterRegion(2,data[1]));
-      data.length>2&&setTempRegionDistrict(filterRegion(3,data[2]));
-      data.length === 3 && setIsComplete(true);
-    }
-  }, [regionList]);
+    const provinceList = findRegion(1);
+    setTempRegionProvince(provinceList);
+    if (data.length === 3) {
+      const cityList = findRegion(2,data);
+      const districtList = findRegion(3,data);
+      const province = provinceList.find(item=>item.id === data[0]);
+      const city = cityList.find(item=>item.id === data[1]);
+      const district = districtList.find(item=>item.id === data[2]);
 
-  // const getTempRegion = (arg) => {
-  //   if (Object.prototype.toString.call(arg) !== '[object Array]') {
-  //     return [];
-  //   }
-  //   return arg;
-  // };
-  const filterRegion=(level,region)=>{
+      const regionRes = [province,city,district].reduce((res,current,index)=>{
+        res.push({
+          selected:index === 2?true:false,
+          id:current.id,
+          parentId:current.parentId,
+          name:current.name
+        })
+        return res
+      },[]);
+
+      setTempRegionCity(cityList);
+      setTempRegionDistrict(districtList);
+      setIsComplete(true);
+      setRegion(regionRes);
+      setRegionComplete(regionRes)
+    }
+  }, [data]);
+
+  const _isArray = (arg) => {
+    return Object.prototype.toString.call(arg) === '[object Array]'
+  };
+  const findRegion=(level,region)=>{
     //默认查询省
     if(level === 1){
-      return delChildRegionList(regionList);
+      return _delChildRegionList(regionList);
     } else if(level === 2){
-      return regionList.filter((item) => region.id === item.id)[0].childRegionList||[];
+      const provinceId = _isArray(region)?region[0]:region.id;
+      return regionList.find((item) => provinceId === item.id).childRegionList||[];
     } else if(level === 3){
-      return regionList.filter((item) => region.parentId == item.id)[0].childRegionList.filter((item) => region.id === item.id)[0].childRegionList||[]||[];
+      const provinceId = _isArray(region)?region[0]:region.parentId;
+      const districtId = _isArray(region)?region[1]:region.id;
+      return regionList.find((item) => provinceId == item.id).childRegionList.find((item) => districtId === item.id).childRegionList||[]||[];
     }
   }
-  const delChildRegionList=(arr)=>{
+  const _delChildRegionList=(arr)=>{
     let newArr = JSON.parse(JSON.stringify(arr));
+    console.log(newArr)
     return newArr.map(item=>{
       delete item.childRegionList;
       return item;
@@ -64,10 +85,10 @@ function CityPicker({
       setIsComplete(false);
     if (index === 1) {
       setTempRegionDistrict([]);
-      setTempRegionCity(filterRegion(2,regionData));
+      setTempRegionCity(findRegion(2,regionData));
     } else if(index === 2) {
       //返回区信息
-      setTempRegionDistrict(filterRegion(3,regionData));
+      setTempRegionDistrict(findRegion(3,regionData));
     } else{
       setSelectTab(3);
     }
@@ -121,31 +142,20 @@ function CityPicker({
     setIsComplete(false);
   }
   const submitPicker=()=>{
-    if(region.length === 3){
-      setRegionComplete(region);
-      setRegion([]);
-    } else{
+    if(region.length!==3){
       return Toast.text('请完善城市信息');
     }
+    setRegionComplete(region);
+    setIsComplete(true);
+    setRegion([]); //清空缓存选项
     setIsShow(!isShow);
     if(typeof onCancel === 'function'){
-      console.log(this)
       onFinish.call(this,region);
     }
   }
-  let ShowCity = null;
-  let cityArr=[];
-  if(isComplete){
-    region.forEach(item=>{
-      cityArr.push(item.name);
-    });
-    ShowCity= (<span>{cityArr.join(',')}</span>)
-  } else if(regionComplete.length ===3){
-    regionComplete.forEach(item=>{
-      cityArr.push(item.name);
-    });
-    ShowCity= (<span>{cityArr.join(',')}</span>)
-
+  let ShowCity = (<span className="placeholder">{placeholder}</span>);
+  if(regionComplete.length===3){
+    ShowCity= (<span>{regionComplete.reduce((regionRes,current)=>{regionRes.push(current.name);return regionRes},[]).join(',')}</span>)
   }
   return (
     <div className="w-picker-container">
@@ -168,10 +178,11 @@ function CityPicker({
 }
 
 CityPicker.propTypes = {
-  data: PropTypes.array, //选中项
+  data: PropTypes.array, //选中值
   regionList: PropTypes.array.isRequired, //所有城市
   maskCanClose: PropTypes.bool, //点击遮罩是否可以关闭 true
   isShowPicker:PropTypes.bool, //默认是否显示 false
+  placeholder:PropTypes.string, //默认显示文案
   onFinish: PropTypes.func, //城市选择完成回调
   onCancel: PropTypes.func, //取消城市选择回调
 };

@@ -40,7 +40,7 @@ class App extends Component {
     <Box>
       <div>城市</div>
       <CityRight>
-        <CityPicker regionList={CityData}/>
+        <CityPicker regionList={CityData} data={[]} />
       </CityRight>
     </Box>
     );

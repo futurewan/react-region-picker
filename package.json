@@ -27,7 +27,7 @@
   },
   "homepage": "https://github.com/futurewan/react-region-picker#readme",
   "dependencies": {
-    "rc-toaster": "^0.1.3",
+    "rc-toaster": "^0.1.6",
     "styled-components": "^5.1.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1"

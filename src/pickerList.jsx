@@ -20,10 +20,10 @@ function pickerList({showListTab,showTabIndex,tempRegionList,tempSelectRegion,on
   )
 }
 pickerList.propTypes = {
-  showListTab: PropTypes.number, //显示地区列表层级
-  showTabIndex: PropTypes.number, //当前地区层级
-  tempRegionList: PropTypes.array, //地区列表
-  tempSelectRegion: PropTypes.array, //所有选择的地区
+  showListTab: PropTypes.number, //当前地区层级
+  showTabIndex: PropTypes.number, //当前地区层级（标识）
+  tempRegionList: PropTypes.array, //当前地区列表
+  tempSelectRegion: PropTypes.array, //已选地区集合
   onSelectRegion: PropTypes.func, //选择后回调
 };
 export default pickerList;

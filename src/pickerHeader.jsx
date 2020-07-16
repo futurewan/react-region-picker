@@ -37,7 +37,7 @@ function pickerHeader({
 }
 
 pickerHeader.propTypes = {
-  tempSelectRegion: PropTypes.array, //所有选择的地区
+  tempSelectRegion: PropTypes.array, //已选地区集合
   onSubmitPicker: PropTypes.func, //提交回调
   onChangeTab: PropTypes.func, //切换省市区回调
 };
