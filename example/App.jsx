@@ -1,12 +1,12 @@
 import { hot } from 'react-hot-loader/root';
 import React, { Component } from 'react';
-import CityPicker from '../src/index';
-// import CityPicker from 'react-region-picker';
+// import CityPicker from '../src/index';
+import CityPicker from 'react-region-picker';
 import styled from 'styled-components';
-// import CityData from 'react-region-picker/lib/city.json';
-import CityData from '../src/city.json';
-// import 'react-region-picker/lib/style.css'
-import '../src/style.less';
+import CityData from 'react-region-picker/lib/city.json';
+// import CityData from '../src/city.json';
+import 'react-region-picker/lib/style.css'
+// import '../src/style.less';
 
 const Box = styled.div`
   display:flex;

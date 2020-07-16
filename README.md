@@ -9,6 +9,7 @@ npm install --save react-region-picker
 ```
 import CityPicker from 'react-region-picker';
 import CityData from 'react-region-picker/lib/city.json';
+import 'react-region-picker/lib/style.css';
 
 <CityPicker regionList={CityData} data={[]} />
 ```
